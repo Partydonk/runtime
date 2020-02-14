@@ -18,6 +18,13 @@ namespace System.Runtime.CompilerServices
         public const string DefaultImplementationsOfInterfaces = nameof(DefaultImplementationsOfInterfaces);
 #endif
 
+#if FEATURE_ABSTRACT_STATIC_INTERFACE_MEMBERS
+        /// <summary>
+        /// Indicates that this version of runtime supports abstract static interface members.
+        /// </summary>
+        public const string AbstractStaticInterfaceMembers = nameof(AbstractStaticInterfaceMembers);
+#endif
+
         /// <summary>
         /// Checks whether a certain feature is supported by the Runtime.
         /// </summary>
@@ -28,6 +35,9 @@ namespace System.Runtime.CompilerServices
                 case PortablePdb:
 #if FEATURE_DEFAULT_INTERFACES
                 case DefaultImplementationsOfInterfaces:
+#endif
+#if FEATURE_ABSTRACT_STATIC_INTERFACE_MEMBERS
+                case AbstractStaticInterfaceMembers:
 #endif
                     return true;
                 case nameof(IsDynamicCodeSupported):

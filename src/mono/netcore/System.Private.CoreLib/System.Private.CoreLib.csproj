@@ -133,7 +133,7 @@
     <NoWarn>$(NoWarn),CS8597,CS8600,CS8601,CS8602,CS8603,CS8604,CS8609,CS8611,CS8618,CS8620,CS8625,CS8631,CS8632,CS8634</NoWarn>
     <NoWarn>$(NoWarn),618,67</NoWarn>
 
-    <DefineConstants>FEATURE_DEFAULT_INTERFACES;FEATURE_MANAGED_ETW_CHANNELS;$(DefineConstants)</DefineConstants>
+    <DefineConstants>FEATURE_ABSTRACT_STATIC_INTERFACE_MEMBERS;FEATURE_DEFAULT_INTERFACES;FEATURE_MANAGED_ETW_CHANNELS;$(DefineConstants)</DefineConstants>
     <DefineConstants>NETCORE;DISABLE_REMOTING;MONO_FEATURE_SRE;$(DefineConstants)</DefineConstants>
 
     <FeaturePortableTimer>true</FeaturePortableTimer>
