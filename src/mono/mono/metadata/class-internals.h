@@ -1515,6 +1515,10 @@ mono_class_enum_basetype_internal (MonoClass *klass);
 gboolean
 mono_method_is_constructor (MonoMethod *method);
 
+/* Is abstract static interface method */
+gboolean
+mono_method_is_asim (MonoMethod *method);
+
 gboolean
 mono_class_has_default_constructor (MonoClass *klass, gboolean public_only);
 

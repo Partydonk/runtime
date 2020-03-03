@@ -7135,10 +7135,12 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 				ensure_method_is_allowed_to_call_method (cfg, method, cil_method);
 
 			if (!virtual_ && (cmethod->flags & METHOD_ATTRIBUTE_ABSTRACT)) {
-				if (!mono_class_is_interface (method->klass))
-					emit_bad_image_failure (cfg, method, cil_method);
-				else
-					virtual_ = TRUE;
+				if (mono_method_is_asim (cmethod)){
+					if (!mono_class_is_interface (method->klass))
+						emit_bad_image_failure (cfg, method, cil_method);
+					else
+						virtual_ = TRUE;
+				}
 			}
 
 			{
@@ -7242,7 +7244,7 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 			/*
 			 * We have the `constrained.' prefix opcode.
 			 */
-			if (constrained_class) {
+			if (constrained_class && mono_method_is_asim (cmethod)){
 				ins = handle_constrained_call (cfg, cmethod, fsig, constrained_class, sp, &cdata, &cmethod, &virtual_, &emit_widen);
 				CHECK_CFG_EXCEPTION;
 				constrained_class = NULL;

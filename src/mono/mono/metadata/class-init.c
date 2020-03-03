@@ -3109,9 +3109,6 @@ mono_class_setup_vtable_general (MonoClass *klass, MonoMethod **overrides, int o
 			MonoMethod *im = ic->methods [im_index];
 			int im_slot = ic_offset + im->slot;
 			MonoMethod *override_im = (override_map != NULL) ? (MonoMethod *)g_hash_table_lookup (override_map, im) : NULL;
-			
-			if (im->flags & METHOD_ATTRIBUTE_STATIC)
-				continue;
 
 			TRACE_INTERFACE_VTABLE (printf ("\tchecking iface method %s\n", mono_method_full_name (im,1)));
 
@@ -3333,6 +3330,12 @@ mono_class_setup_vtable_general (MonoClass *klass, MonoMethod **overrides, int o
 
 	g_assert (cur_slot <= max_vtsize);
 
+#if false
+
+	// Abstract Static Interface Methods:
+	//   - We skip this check altogether for now, as we currnetly end up with NULL vtable slots.
+	//   - In the future, we should likely shrink the vtable to not include static methods
+	
 	/* Ensure that all vtable slots are filled with concrete instance methods */
 	// Now it is okay to implement a class that is not abstract and implements a interface that has an abstract method because it's reabstracted
 	if (!mono_class_is_abstract (klass)) {
@@ -3354,7 +3357,8 @@ mono_class_setup_vtable_general (MonoClass *klass, MonoMethod **overrides, int o
 			}
 		}
 	}
-
+#endif
+	
 	if (mono_class_is_ginst (klass)) {
 		MonoClass *gklass = mono_class_get_generic_class (klass)->container_class;
 

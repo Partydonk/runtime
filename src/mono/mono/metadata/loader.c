@@ -1244,6 +1244,14 @@ mono_get_method_checked (MonoImage *image, guint32 token, MonoClass *klass, Mono
 	return result;
 }
 
+gboolean
+mono_method_is_asim (MonoMethod *method)
+{
+	const int static_virtual_abstract = METHOD_ATTRIBUTE_STATIC | METHOD_ATTRIBUTE_VIRTUAL | METHOD_ATTRIBUTE_ABSTRACT;
+
+	return (method->flags & static_virtual_abstract) == static_virtual_abstract;
+}
+
 static MonoMethod*
 get_method_constrained (MonoImage *image, MonoMethod *method, MonoClass *constrained_class, MonoGenericContext *context, MonoError *error)
 {
@@ -1312,6 +1320,17 @@ get_method_constrained (MonoImage *image, MonoMethod *method, MonoClass *constra
 		if ((method->flags & METHOD_ATTRIBUTE_VIRTUAL) == 0)
 			return method;
 		mono_class_setup_vtable (constrained_class);
+
+		if (mono_class_has_failure (constrained_class)) {
+			mono_error_set_for_class_failure (error, constrained_class);
+			return NULL;
+		}
+
+		/* Need to setup the constrained_class, otherwise constrained_class->methods is NULL */
+		if (mono_method_is_asim (method)){
+			mono_class_setup_methods (constrained_class);
+		}
+		
 		if (mono_class_has_failure (constrained_class)) {
 			mono_error_set_for_class_failure (error, constrained_class);
 			return NULL;
@@ -1327,10 +1346,27 @@ get_method_constrained (MonoImage *image, MonoMethod *method, MonoClass *constra
 	}
 	g_assert (vtable_slot >= 0);
 
-	MonoMethod *res = mono_class_get_vtable_entry (constrained_class, vtable_slot);
-	if (res == NULL && mono_class_is_abstract (constrained_class) ) {
-		/* Constraining class is abstract, there may not be a refined method. */
-		return method;
+	MonoMethod *res = NULL;
+	if (mono_method_is_asim (method)){
+		/* Until we have methodimpl maps, a poor man's version of the method matching */
+		
+		MonoMethod *cm;
+		gpointer iter = NULL;
+		while ((cm = mono_class_get_methods (constrained_class, &iter))) {
+			// this should compare the signature, with (mono_metadata_signature_equal (cm->signature, method->signature)
+			// but the method->signature is currently empty, something is missing.
+
+			if (strcmp (cm->name, method->name) == 0){
+				res = cm;
+				break;
+			}
+		}
+	} else {
+		res = mono_class_get_vtable_entry (constrained_class, vtable_slot);
+		if (res == NULL && mono_class_is_abstract (constrained_class) ) {
+			/* Constraining class is abstract, there may not be a refined method. */
+			return method;
+		}
 	}
 	g_assert (res != NULL);
 	if (inflated_generic_method) {
