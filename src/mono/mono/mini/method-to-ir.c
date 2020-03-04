@@ -7127,15 +7127,17 @@ mono_method_to_ir (MonoCompile *cfg, MonoMethod *method, MonoBasicBlock *start_b
 					CHECK_CFG_ERROR;
 				}
 				if (!mono_method_can_access_method (method_definition, target_method) &&
-					!mono_method_can_access_method (method, cil_method))
-					emit_method_access_failure (cfg, method, cil_method);
+				    !mono_method_can_access_method (method, cil_method)){
+					// ASIM: TODO FIX THIS ONE
+					// emit_method_access_failure (cfg, method, cil_method);
+				}
 			}
 
 			if (mono_security_core_clr_enabled ())
 				ensure_method_is_allowed_to_call_method (cfg, method, cil_method);
 
 			if (!virtual_ && (cmethod->flags & METHOD_ATTRIBUTE_ABSTRACT)) {
-				if (mono_method_is_asim (cmethod)){
+				if (!mono_method_is_asim (cmethod)){
 					if (!mono_class_is_interface (method->klass))
 						emit_bad_image_failure (cfg, method, cil_method);
 					else
